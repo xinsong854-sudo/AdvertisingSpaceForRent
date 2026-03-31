@@ -622,13 +622,14 @@
         }
 
         .subcategory {
-            max-height: none;
-            overflow: visible;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             margin-top: 8px;
         }
 
         .subcategory.show {
-            max-height: none;
+            max-height: 3000px;
         }
 
         /* 子分类标题（可折叠）- 优化动画和视觉层次 */
@@ -714,13 +715,15 @@
         /* 子分类标签区域 - 使用 grid-template-rows 实现流畅动画 */
         .subcategory-tags {
             display: grid;
-            grid-template-rows: 1fr;
-            padding: 4px 12px 8px 12px;
+            grid-template-rows: 0fr;
+            transition: grid-template-rows 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 0 12px;
             margin-left: 6px;
         }
 
         .subcategory-tags.show {
             grid-template-rows: 1fr;
+            padding: 4px 12px 8px 12px;
         }
 
         .subcategory-tags-inner {
@@ -840,13 +843,15 @@
         /* 三级分类标签区域优化 - 使用 grid-template-rows 动画 */
         .level3-tags {
             display: grid;
-            grid-template-rows: 1fr;
-            padding: 4px 8px;
+            grid-template-rows: 0fr;
+            transition: grid-template-rows 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 0 8px;
             margin-left: 8px;
         }
 
         .level3-tags.show {
             grid-template-rows: 1fr;
+            padding: 4px 8px;
             padding: 4px 8px 8px 8px;
         }
 
@@ -1386,9 +1391,6 @@
         </div>
 
         <!-- 标签分类内容（最上方） -->
-        <div class="content-hint" style="text-align:center;padding:10px;background:#fff3cd;border-radius:8px;margin-bottom:15px;font-size:14px;color:#856404;">
-            💡 点击下方分类标题可展开/收起标签列表
-        </div>
         <div id="content"></div>
 
         <!-- 敏感词检测器 -->
@@ -5617,7 +5619,7 @@
                 `;
                 
                 const subcatDiv = document.createElement('div');
-                subcatDiv.className = 'subcategory show';
+                subcatDiv.className = 'subcategory';
                 subcatDiv.id = `subcat-${catIndex}`;
                 
                 category.items.forEach((subcat, subIndex) => {
@@ -5637,12 +5639,14 @@
                         `;
                         
                         const subTagsDiv = document.createElement('div');
-                        subTagsDiv.className = 'subcategory-tags show';
+                        subTagsDiv.className = 'subcategory-tags';
                         subTagsDiv.id = subId;
+                        subTagsDiv.setAttribute('data-rendered', 'false');
                         subTagsDiv.onclick = (e) => e.stopPropagation();
                         
-                        // 立即渲染三级内容
-                        const renderLevel3Content = () => {
+                        // 懒渲染：只在展开时渲染三级内容
+                        subTagsDiv._renderContent = () => {
+                            if (subTagsDiv.getAttribute('data-rendered') === 'true') return;
                             
                             const innerDiv = document.createElement('div');
                             innerDiv.className = 'subcategory-tags-inner';
@@ -5661,8 +5665,9 @@
                                 `;
                                 
                                 const l3TagsDiv = document.createElement('div');
-                                l3TagsDiv.className = 'level3-tags show';
+                                l3TagsDiv.className = 'level3-tags';
                                 l3TagsDiv.id = l3Id;
+                                l3TagsDiv.setAttribute('data-rendered', 'false');
                                 
                                 const l3InnerDiv = document.createElement('div');
                                 l3InnerDiv.className = 'level3-tags-inner';
@@ -5687,10 +5692,15 @@
                             });
                             
                             subTagsDiv.appendChild(innerDiv);
+                            subTagsDiv.setAttribute('data-rendered', 'true');
+                            
+                            // 添加可见性动画
+                            setTimeout(() => {
+                                subTagsDiv.querySelectorAll('.level3-item').forEach((item, idx) => {
+                                    setTimeout(() => item.classList.add('visible'), idx * 30);
+                                });
+                            }, 50);
                         };
-                        
-                        // 立即渲染
-                        renderLevel3Content();
                         
                         subItemDiv.appendChild(subHeaderDiv);
                         subItemDiv.appendChild(subTagsDiv);
@@ -5702,7 +5712,7 @@
                         `;
                         
                         const subTagsDiv = document.createElement('div');
-                        subTagsDiv.className = 'subcategory-tags show';
+                        subTagsDiv.className = 'subcategory-tags';
                         subTagsDiv.id = subId;
                         
                         const innerDiv = document.createElement('div');
@@ -5782,15 +5792,6 @@
                 
                 tagsDiv.classList.add('show');
                 chevron.classList.add('active');
-                
-                // 添加子分类项的可见性动画
-                const parentItem = tagsDiv.closest('.subcategory-item');
-                if (parentItem) {
-                    const subItems = parentItem.querySelectorAll('.subcategory-item');
-                    subItems.forEach((item, idx) => {
-                        setTimeout(() => item.classList.add('visible'), idx * 40);
-                    });
-                }
             }
         }
 
@@ -5806,20 +5807,13 @@
                 tagsDiv.classList.remove('show');
                 chevron.classList.remove('active');
             } else {
+                // 懒渲染
+                if (tagsDiv._renderContent) {
+                    tagsDiv._renderContent();
+                }
+                
                 tagsDiv.classList.add('show');
                 chevron.classList.add('active');
-                
-                // 添加标签的淡入动画
-                const tagSpans = tagsDiv.querySelectorAll('.tag');
-                tagSpans.forEach((tag, idx) => {
-                    tag.style.opacity = '0';
-                    tag.style.transform = 'translateY(5px)';
-                    setTimeout(() => {
-                        tag.style.transition = 'opacity 0.2s ease, transform 0.2s ease';
-                        tag.style.opacity = '1';
-                        tag.style.transform = 'translateY(0)';
-                    }, idx * 15);
-                });
             }
         }
 
