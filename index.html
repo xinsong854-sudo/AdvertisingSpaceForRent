@@ -1188,47 +1188,6 @@
             margin-top: 30px;
         }
 
-        .footer .promo {
-            margin-top: 15px;
-            padding: 15px;
-            background: var(--pale-blue);
-            border-radius: 8px;
-            font-size: 13px;
-            color: var(--text-medium);
-            display: inline-flex;
-            align-items: center;
-            gap: 12px;
-            cursor: pointer;
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .footer .promo:hover {
-            background: var(--light-blue);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(168, 200, 232, 0.4);
-        }
-
-        .footer .promo:active {
-            transform: translateY(0) scale(0.98);
-        }
-
-        .footer .promo strong {
-            color: var(--text-dark);
-            font-size: 14px;
-        }
-
-        .promo-icon {
-            width: 80px;
-            height: 80px;
-            object-fit: contain;
-            border-radius: 50%;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            background: #ffffff;
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .footer .promo:hover .promo-icon {
-            transform: scale(1.05) rotate(5deg);
         }
 
         /* 全局移动端适配优化 */
@@ -1815,13 +1774,6 @@
         <div class="footer">
             整理自 Danbooru / 共 800+ 标签
             
-            <div class="promo">
-                <img src="footer-character.png" alt="伪人大本营" class="promo-icon" onclick="footerClick()">
-                <div>
-                    <strong>伪人大本营</strong><br>
-                    群号：1062624601<br>
-                    欢迎加入～
-                </div>
             </div>
         </div>
     </div>
@@ -15753,9 +15705,6 @@
         }
 
         // 底部角色点击
-        function footerClick() {
-            showToast('别戳啦别戳啦');
-        }
 
         // 检查是否是误报组合
         function isFalsePositive(text, match) {
