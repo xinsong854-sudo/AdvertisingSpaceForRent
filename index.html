@@ -6215,6 +6215,14 @@
                 try {
                     renderContent();
                     console.log('✅ 页面渲染成功');
+                    
+                    // 默认展开第一个分类
+                    setTimeout(() => {
+                        const firstHeader = document.querySelector('.category-header');
+                        if (firstHeader) {
+                            firstHeader.click();
+                        }
+                    }, 100);
                 } catch (e) {
                     console.error('❌ renderContent 错误:', e);
                     const content = document.getElementById('content');
