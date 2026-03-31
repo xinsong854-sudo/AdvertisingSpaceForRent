@@ -15343,6 +15343,9 @@
 
             const wasActive = header.classList.contains('active');
 
+            // 保存当前滚动位置
+            const scrollY = window.scrollY;
+
             document.querySelectorAll('.category-header').forEach(h => {
                 h.classList.remove('active');
                 h.nextElementSibling.classList.remove('show');
@@ -15356,6 +15359,9 @@
                 header.classList.add('active');
                 subcategory.classList.add('show');
                 chevron.classList.add('active');
+                
+                // 恢复滚动位置，避免页面跳动
+                window.scrollTo(0, scrollY);
             }
         }
 
