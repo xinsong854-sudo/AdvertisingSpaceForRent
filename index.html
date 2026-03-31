@@ -5870,59 +5870,76 @@
 
             tagData.forEach(category => {
                 category.items.forEach(item => {
-                    item.tags.forEach(tag => {
-                        const en = tag.en;
-                        // 画师
-                        if (category.title.includes('画师')) {
-                            extracted.artists.push(en);
-                        }
-                        // 风格
-                        else if (category.title.includes('艺术风格') || category.title.includes('特殊风格') || category.title.includes('东方风格')) {
-                            extracted.styles.push(en);
-                        }
-                        // 比例
-                        else if (category.title.includes('人物比例')) {
-                            extracted.ratios.push(en);
-                        }
-                        // 头发
-                        else if (category.title.includes('发型')) {
-                            extracted.hair.push(en);
-                        }
-                        // 服装
-                        else if (category.title.includes('服装') || category.title.includes('连衣裙') || category.title.includes('内衣')) {
-                            extracted.clothes.push(en);
-                        }
-                        // 姿势/动作
-                        else if (category.title.includes('动作') || category.title.includes('姿势')) {
-                            extracted.poses.push(en);
-                        }
-                        // 表情（微动作中的一些）
-                        else if (item.title.includes('微动作')) {
-                            extracted.expressions.push(en);
-                        }
-                        // 光影
-                        else if (category.title.includes('打光') || item.title.includes('打光')) {
-                            extracted.lighting.push(en);
-                        }
-                        // 背景
-                        else if (category.title.includes('背景装饰') || item.title.includes('背景')) {
-                            extracted.backgrounds.push(en);
-                        }
-                        // 配饰
-                        else if (category.title.includes('配饰')) {
-                            extracted.accessories.push(en);
-                        }
-                        // 非人特征
-                        else if (category.title.includes('非人')) {
-                            extracted.nonhuman.push(en);
-                        }
-                        // 特效
-                        else if (item.title.includes('特效') || item.title.includes('效果') || en.includes('sparkle') || en.includes('glow') || en.includes('light')) {
-                            extracted.effects.push(en);
-                        }
-                    });
+                    // 处理三级结构：如果 item 有 items 属性，遍历子项
+                    if (item.items && item.items.length > 0) {
+                        item.items.forEach(subItem => {
+                            if (subItem.tags) {
+                                subItem.tags.forEach(tag => {
+                                    processTag(tag.en, category.title, item.title);
+                                });
+                            }
+                        });
+                    } else if (item.tags) {
+                        // 处理二级结构：直接遍历 tags
+                        item.tags.forEach(tag => {
+                            processTag(tag.en, category.title, item.title);
+                        });
+                    }
                 });
             });
+
+            function processTag(en, categoryTitle, itemTitle) {
+                // 画师
+                if (categoryTitle.includes('画师')) {
+                    extracted.artists.push(en);
+                }
+                // 风格
+                else if (categoryTitle.includes('艺术风格') || categoryTitle.includes('特殊风格') || categoryTitle.includes('东方风格')) {
+                    extracted.styles.push(en);
+                }
+                // 比例
+                else if (categoryTitle.includes('人物比例')) {
+                    extracted.ratios.push(en);
+                }
+                // 头发
+                else if (categoryTitle.includes('发型')) {
+                    extracted.hair.push(en);
+                }
+                // 服装
+                else if (categoryTitle.includes('服装') || categoryTitle.includes('连衣裙') || categoryTitle.includes('内衣')) {
+                    extracted.clothes.push(en);
+                }
+                // 姿势/动作
+                else if (categoryTitle.includes('动作') || categoryTitle.includes('姿势')) {
+                    extracted.poses.push(en);
+                }
+                // 表情（微动作中的一些）
+                else if (itemTitle.includes('微动作')) {
+                    extracted.expressions.push(en);
+                }
+                // 光影
+                else if (categoryTitle.includes('打光') || itemTitle.includes('打光')) {
+                    extracted.lighting.push(en);
+                }
+                // 背景
+                else if (categoryTitle.includes('背景装饰') || itemTitle.includes('背景')) {
+                    extracted.backgrounds.push(en);
+                }
+                // 配饰
+                else if (categoryTitle.includes('配饰')) {
+                    extracted.accessories.push(en);
+                }
+                // 非人特征
+                else if (categoryTitle.includes('非人')) {
+                    extracted.nonhuman.push(en);
+                }
+                // 特效
+                else if (itemTitle.includes('特效') || itemTitle.includes('效果') || en.includes('sparkle') || en.includes('glow') || en.includes('light')) {
+                    extracted.effects.push(en);
+                }
+            }
+
+            return extracted;
 
             return extracted;
         }
